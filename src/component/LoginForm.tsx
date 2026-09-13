@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useAuth } from "@/context/AuthContext";
+import { HOME_ROUTE } from "@/lib/routes";
 import {
   Container,
   TextField,
@@ -22,30 +24,29 @@ const schema = yup.object({
 });
 export default function LoginForm() {
   const router = useRouter();
+  const { login } = useAuth();
   const [error, setError] = useState("");
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(schema),
   });
 
   const onSubmit = async (data: { email: string; password: string }) => {
+    setError("");
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        throw new Error("Login failed");
-      }
-      router.push("/movie");
-    } catch (err: any) {
-      setError(err.message || "Login failed");
+      await login(data.email, data.password);
+      // Only follow internal redirects that the guard put in the URL.
+      const redirect = router.query.redirect;
+      const target =
+        typeof redirect === "string" && redirect.startsWith("/")
+          ? redirect
+          : HOME_ROUTE;
+      router.replace(target);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed");
     }
   };
 
@@ -85,8 +86,9 @@ export default function LoginForm() {
               variant="contained"
               color="primary"
               sx={{ marginTop: 2 }}
+              disabled={isSubmitting}
             >
-              Login
+              {isSubmitting ? "Logging in..." : "Login"}
             </Button>
           </Box>
         </Paper>
