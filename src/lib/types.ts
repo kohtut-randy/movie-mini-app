@@ -2,10 +2,10 @@ export type Role = "admin" | "user";
 export type Mode = "create" | "edit";
 
 export interface User {
-  id: string;
+  id?: string;
   email: string;
   password: string;
-  role: Role;
+  role?: Role;
 }
 
 export interface Movie {

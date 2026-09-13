@@ -12,6 +12,7 @@ import {
   Alert,
   Paper,
 } from "@mui/material";
+import useAuth from "@/hooks/useAuth";
 
 const schema = yup.object({
   email: yup.string().email("Invalid email").required("Email required"),
@@ -22,6 +23,8 @@ const schema = yup.object({
 });
 export default function LoginForm() {
   const router = useRouter();
+
+  const auth = useAuth();
   const [error, setError] = useState("");
   const {
     register,
@@ -31,18 +34,20 @@ export default function LoginForm() {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = async (data: { email: string; password: string }) => {
+  const onSubmit = async (formdata: { email: string; password: string }) => {
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formdata),
       });
+      const res = await response.json();
       if (!response.ok) {
         throw new Error("Login failed");
       }
+      auth.setProfile({ email: res.data.profile.email });
       router.push("/movie");
     } catch (err: any) {
       setError(err.message || "Login failed");
