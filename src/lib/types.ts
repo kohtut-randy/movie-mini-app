@@ -8,6 +8,9 @@ export interface User {
   role: Role;
 }
 
+/** User data safe to expose to the client (no password). */
+export type AuthUser = Omit<User, "password">;
+
 export interface Movie {
   id: string;
   title: string;
