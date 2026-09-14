@@ -10,12 +10,10 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       (user) => user.email === email && user.password === password,
     );
     if (user) {
-      return res
-        .status(200)
-        .json({
-          message: "Login successful",
-          data: { profile: { email: user.email } },
-        });
+      return res.status(200).json({
+        message: "Login successful",
+        data: { profile: { email: user.email, role: user.role } },
+      });
     } else {
       return res
         .status(401)

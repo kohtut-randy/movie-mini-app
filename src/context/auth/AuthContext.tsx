@@ -1,7 +1,8 @@
-import { ComponentProps, createContext, use, useState } from "react";
+import { ComponentProps, createContext, useState } from "react";
 
 type ProfileType = {
   email: string;
+  role: string;
 };
 type AuthDataType = {
   profile: null | ProfileType;

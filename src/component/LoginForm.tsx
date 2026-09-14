@@ -47,7 +47,10 @@ export default function LoginForm() {
       if (!response.ok) {
         throw new Error("Login failed");
       }
-      auth.setProfile({ email: res.data.profile.email });
+      auth.setProfile({
+        email: res.data.profile.email,
+        role: res.data.profile.role,
+      });
       router.push("/movie");
     } catch (err: any) {
       setError(err.message || "Login failed");

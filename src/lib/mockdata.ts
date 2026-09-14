@@ -169,12 +169,12 @@ export const db = {
           m.description.toLowerCase().includes(s),
       );
     }
-    if (filters?.minPrice !== undefined) {
-      filtered = filtered.filter((m) => m.price >= filters.minPrice!);
-    }
-    if (filters?.maxPrice !== undefined) {
-      filtered = filtered.filter((m) => m.price <= filters.maxPrice!);
-    }
+    // if (filters?.minPrice !== undefined) {
+    //   filtered = filtered.filter((m) => m.price >= filters.minPrice!);
+    // }
+    // if (filters?.maxPrice !== undefined) {
+    //   filtered = filtered.filter((m) => m.price <= filters.maxPrice!);
+    // }
 
     const page = filters?.page || 1;
     const limit = filters?.limit || 6;

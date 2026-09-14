@@ -1,56 +1,94 @@
-import { useState } from 'react'
-import MovieCard from '@/component/MovieCard'
-import MovieForm from '@/component/MovieForm'
-import { Dialog, Button, Box, TextField } from '@mui/material'
-import useMovies from '@/hooks/useMovies'
+import { useState } from "react";
+import useAuth from "@/hooks/useAuth";
+import MovieCard from "@/component/MovieCard";
+import MovieForm from "@/component/MovieForm";
+import { Dialog, Button, Box, TextField } from "@mui/material";
+import useMovies from "@/hooks/useMovies";
 
 export default function Movies() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
+  const { profileData } = useAuth();
 
-  const { movies, isError, isLoading, deleteMovie, invalidateMovies, error, filters, setFilters } = useMovies()
+  const isAdmin = profileData?.role === "admin";
 
-  const isNextDisabled = !movies?.length
+  const {
+    movies,
+    isError,
+    isLoading,
+    invalidateMovies,
+    error,
+    filters,
+    setFilters,
+    deleteMovieMutation,
+    createMovieMutation,
+  } = useMovies();
+
+  const isNextDisabled = !movies?.length;
 
   async function hundleSuccess() {
-    setOpen(false)
-    await invalidateMovies()
+    setOpen(false);
+    await invalidateMovies();
   }
 
   return (
     <Box sx={{ p: 4, gap: 10 }}>
-      {isLoading && <div className='text-blue-500 bg-blue-100'>Loading...</div>}
-      {isError && <div className='text-red-500'>Error: {String(error)}</div>}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
+      {isLoading && <div className="text-blue-500 bg-blue-100">Loading...</div>}
+      {isError && <div className="text-red-500">Error: {String(error)}</div>}
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
         <TextField
-          type='text'
-          placeholder='Search...'
+          type="text"
+          placeholder="Search..."
           value={filters.search}
-          onChange={e => setFilters({ ...filters, search: e.target.value })}
-          className='mb-4 px-4 py-2 border rounded bg-white text-black'
+          onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+          className="mb-4 px-4 py-2 border rounded bg-white text-black"
         />
-        <Button variant='contained' onClick={() => setOpen(true)}>
-          Create Movie
-        </Button>
+        {isAdmin && (
+          <Button variant="contained" onClick={() => setOpen(true)}>
+            Create Movie
+          </Button>
+        )}
       </Box>
 
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
         {movies?.map((movie: any) => (
-          <MovieCard key={movie.id} movie={movie} deleteMovie={deleteMovie} />
+          <MovieCard
+            key={movie.id}
+            movie={movie}
+            deleteMovie={deleteMovieMutation.mutate}
+            isAdmin={isAdmin}
+          />
         ))}
       </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, mt: 8 }}>
-        <Button onClick={() => setFilters({ ...filters, page: filters.page - 1 })} disabled={filters.page === 1} variant='contained'>
+      <Box sx={{ display: "flex", justifyContent: "center", gap: 4, mt: 8 }}>
+        <Button
+          onClick={() => setFilters({ ...filters, page: filters.page - 1 })}
+          disabled={filters.page === 1}
+          variant="contained"
+        >
           previous page
         </Button>
-        <Button onClick={() => setFilters({ ...filters, page: filters.page + 1 })} disabled={isNextDisabled} variant='contained'>
+        <Button
+          onClick={() => setFilters({ ...filters, page: filters.page + 1 })}
+          disabled={isNextDisabled}
+          variant="contained"
+        >
           next page
         </Button>
 
         {/* <div ref={divRef}>I am Div</div> */}
       </Box>
-      <Dialog fullWidth={true} maxWidth='md' open={open} onClose={() => setOpen(false)}>
-        <MovieForm mode='create' onSuccess={hundleSuccess} />
+      <Dialog
+        fullWidth={true}
+        maxWidth="md"
+        open={open}
+        onClose={() => setOpen(false)}
+      >
+        <MovieForm
+          mode="create"
+          onSuccess={hundleSuccess}
+          createMovieMutation={createMovieMutation}
+        />
       </Dialog>
     </Box>
-  )
+  );
 }

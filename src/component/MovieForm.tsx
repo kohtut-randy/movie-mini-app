@@ -1,14 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import {
-  Container,
-  TextField,
-  Button,
-  Typography,
-  Paper,
-  Grid,
-  Alert,
-} from "@mui/material";
+import { Container, TextField, Button, Typography } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -27,9 +19,18 @@ type Props = {
   data?: Movie;
   id?: string;
   onSuccess: () => void;
+  createMovieMutation?: any;
+  updateMovieMutation?: any;
 };
 
-const MovieForm = ({ mode, data, id, onSuccess }: Props) => {
+const MovieForm = ({
+  mode,
+  data,
+  id,
+  onSuccess,
+  createMovieMutation,
+  updateMovieMutation,
+}: Props) => {
   const [error, setError] = useState("");
   const {
     register,
@@ -48,34 +49,12 @@ const MovieForm = ({ mode, data, id, onSuccess }: Props) => {
 
   const onsubmit = async (data: MovieFormPayload) => {
     if (mode === "create") {
-      const response = await fetch("/api/movie", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      if (response.ok) {
-        onSuccess();
-      }
-      if (!response.ok) {
-        throw new Error("Submission failed");
-      }
+      createMovieMutation.mutate(data);
+      onSuccess();
     }
     if (mode === "edit") {
-      const response = await fetch(`/api/movie/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      if (response.ok) {
-        onSuccess();
-      }
-      if (!response.ok) {
-        throw new Error("Submission failed");
-      }
+      updateMovieMutation.mutate({ id: id as string, movieData: data });
+      onSuccess();
     }
   };
 

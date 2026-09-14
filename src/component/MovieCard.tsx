@@ -19,11 +19,15 @@ interface Movie {
 export default function MovieCard({
   movie,
   deleteMovie,
+  isAdmin,
 }: {
   movie: Movie;
   deleteMovie: (id: string) => void;
+  isAdmin: boolean;
 }) {
   const router = useRouter();
+
+  // const isAdmin = true; // Replace with actual admin check logic if available
   return (
     <Card className="h-full flex flex-col min-w-[300px]">
       <CardContent className="flex-1">
@@ -39,13 +43,15 @@ export default function MovieCard({
         <Button size="small" onClick={() => router.push(`/movie/${movie.id}`)}>
           View
         </Button>
-        <Button
-          size="small"
-          color="error"
-          onClick={() => deleteMovie(movie.id)}
-        >
-          Delete
-        </Button>
+        {isAdmin && (
+          <Button
+            size="small"
+            color="error"
+            onClick={() => deleteMovie(movie.id)}
+          >
+            Delete
+          </Button>
+        )}
       </CardActions>
     </Card>
   );

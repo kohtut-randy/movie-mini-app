@@ -9,13 +9,13 @@ export interface User {
 }
 
 export interface Movie {
-  id: string;
+  id?: string;
   title: string;
   description: string;
   price: number;
   genre: string;
   releaseYear: number;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface MovieFormPayload {
