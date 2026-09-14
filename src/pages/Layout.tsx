@@ -1,24 +1,35 @@
-import { ReactNode } from 'react'
+import { ReactNode, useEffect } from 'react'
 import Navbar from '../component/Navbar'
 import Footer from '../component/Footer'
 import useAuth from '@/hooks/useAuth'
+import LoginForm from '@/component/LoginForm'
+import { useRouter } from 'next/router'
+
+const LayoutContainer = ({ children }: { children: React.ReactNode }) => {
+  return <div className='min-h-screen flex flex-col gap-10'>{children}</div>
+}
 
 export default function Layout({ children }: { children: ReactNode }) {
-  const auth = useAuth()
+  const router = useRouter()
+  const { isLogin } = useAuth()
+
+  const currentPathname = router?.pathname
+
+  useEffect(() => {
+    if (!isLogin) {
+      router.push('/')
+    } else if (currentPathname === '/') {
+      router.push('/movie')
+    }
+  }, [isLogin, currentPathname])
 
   return (
-    <div className='min-h-screen flex flex-col gap-10'>
-      {auth.isLogin && <Navbar />}
-      <main>{children}</main>
+    <LayoutContainer>
+      {isLogin && <Navbar />}
 
-      {/* <button */}
-      {/*   className="text-white" */}
-      {/*   onClick={() => auth.setProfile({ email: "hein" })} */}
-      {/* > */}
-      {/*   Login */}
-      {/* </button> */}
+      {isLogin ? <main>{children}</main> : <LoginForm />}
 
-      {auth.isLogin && <Footer />}
-    </div>
+      {isLogin && <Footer />}
+    </LayoutContainer>
   )
 }
